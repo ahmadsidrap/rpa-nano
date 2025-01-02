@@ -3,6 +3,7 @@ import subprocess
 import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .libs.docker import Docker
 
 # Start the container
 class RpaUp(APIView):
@@ -25,20 +26,8 @@ class RpaDown(APIView):
 # Get active containers
 class RpaActive(APIView):
     def get(self, request):
-        result = subprocess.run(["docker", "ps", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
-        data = [
-            {
-                "ID": container["ID"],
-                "Names": container["Names"],
-                "Networks": container["Networks"],
-                "Image": container["Image"],
-                "CreatedAt": container["CreatedAt"],
-                "Status": container["Status"],
-                "Ports": container["Ports"],
-                "State": container["State"]
-            }
-            for container in (json.loads(line) for line in result.stdout.splitlines())
-        ]
+        docker = Docker()
+        data = docker.get_active()
         return Response({"message": "Success", "data": data})
 
 # Get images
@@ -71,4 +60,31 @@ class RpaVolume(APIView):
             }
             for volume in (json.loads(line) for line in result.stdout.splitlines())
         ]
+        return Response({"message": "Success", "data": data})
+    
+# Copy data
+class RpaCopy(APIView):
+    def get(self, request):
+        # Get active containers
+        docker = Docker()
+        data = docker.get_active(True)
+
+        # Get the source and destination containers
+        container = request.query_params.get("container", None)
+        source = request.query_params.get("src", None)
+        destination = request.query_params.get("dst", None)
+        containerDst = data[f"rpa-{container}"]
+        idDst = containerDst["ID"]
+        pathSrc = f"./shared/{source}"
+        pathDst = f"{idDst}:/{destination}"
+
+        try:
+            # Copy the data
+            subprocess.run(["docker", "cp", pathSrc, pathDst], check=True, capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
+
+        data = {
+            "destination": containerDst["ID"],
+        }
         return Response({"message": "Success", "data": data})

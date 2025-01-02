@@ -20,7 +20,8 @@ from .views import (
     RpaDown,
     RpaActive,
     RpaImage,
-    RpaVolume
+    RpaVolume,
+    RpaCopy
 )
 
 urlpatterns = [
@@ -30,4 +31,5 @@ urlpatterns = [
     path('rpa/active', RpaActive.as_view(), name='rpa.active'),
     path('rpa/image', RpaImage.as_view(), name='rpa.image'),
     path('rpa/volume', RpaVolume.as_view(), name='rpa.volume'),
+    path('rpa/copy', RpaCopy.as_view(), name='rpa.copy'),
 ]
