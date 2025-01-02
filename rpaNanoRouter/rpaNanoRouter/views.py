@@ -27,5 +27,17 @@ class RpaActive(APIView):
     def get(self, request):
         subprocess.run(["docker", "ps"], check=True)
         result = subprocess.run(["docker", "ps", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
-        data = [json.loads(line) for line in result.stdout.splitlines()]
+        data = [
+            {
+            "ID": container["ID"],
+            "Names": container["Names"],
+            "Networks": container["Networks"],
+            "Image": container["Image"],
+            "CreatedAt": container["CreatedAt"],
+            "Status": container["Status"],
+            "Ports": container["Ports"],
+            "State": container["State"]
+            }
+            for container in (json.loads(line) for line in result.stdout.splitlines())
+        ]
         return Response({"message": "Success", "data": data})
