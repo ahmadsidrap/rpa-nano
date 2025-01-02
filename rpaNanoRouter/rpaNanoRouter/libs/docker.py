@@ -1,7 +1,9 @@
 import json
 import subprocess
 
+# Define the Docker class
 class Docker:
+    # Get active containers
     def get_active(self, useKey=False):
         result = subprocess.run(["docker", "ps", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
         if not useKey:

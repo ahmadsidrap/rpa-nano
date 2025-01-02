@@ -3,6 +3,6 @@ db.sqlite3
 
 # Cache
 rpaNanoRouter/__pycache__/
+rpaNanoRouter/libs/__pycache__/
 
 shared/
-libs/__pycache__/

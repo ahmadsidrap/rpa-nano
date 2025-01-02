@@ -12,7 +12,10 @@ class RpaUp(APIView):
         # Read path parameters
         app_name = request.query_params.get("app_name", None)
         filename = f"./containers/{app_name}/docker-compose.yaml"
-        subprocess.run(["docker-compose", "-f", filename, "up", "-d"], check=True)
+        try:
+            subprocess.run(["docker-compose", "-f", filename, "up", "-d"], check=True)
+        except subprocess.CalledProcessError as e:
+            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         return Response({"message": "Success"})
 
 # Shut down the container
@@ -20,20 +23,29 @@ class RpaDown(APIView):
     def get(self, request):
         app_name = request.query_params.get("app_name", None)
         filename = f"./containers/{app_name}/docker-compose.yaml"
-        subprocess.run(["docker-compose", "-f", filename, "down"], check=True)
+        try:
+            subprocess.run(["docker-compose", "-f", filename, "down"], check=True)
+        except subprocess.CalledProcessError as e:
+            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         return Response({"message": "Success"})
 
 # Get active containers
 class RpaActive(APIView):
     def get(self, request):
         docker = Docker()
-        data = docker.get_active()
+        try:
+            data = docker.get_active()
+        except subprocess.CalledProcessError as e:
+            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         return Response({"message": "Success", "data": data})
 
 # Get images
 class RpaImage(APIView):
     def get(self, request):
-        result = subprocess.run(["docker", "image", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        try:
+            result = subprocess.run(["docker", "image", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         data = [
             {
                 "Repository": image["Repository"],
@@ -49,7 +61,10 @@ class RpaImage(APIView):
 # Get volumes
 class RpaVolume(APIView):
     def get(self, request):
-        result = subprocess.run(["docker", "volume", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        try:
+            result = subprocess.run(["docker", "volume", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         data = [
             {
                 "Driver": volume["Driver"],
