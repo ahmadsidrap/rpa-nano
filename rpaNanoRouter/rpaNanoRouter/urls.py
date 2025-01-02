@@ -17,11 +17,13 @@ from django.contrib import admin
 from django.urls import include, path
 from .views import (
     RpaUp,
-    RpaDown
+    RpaDown,
+    RpaActive,
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('rpa/up', RpaUp.as_view(), name='input'),
-    path('rpa/down', RpaDown.as_view(), name='input'),
+    path('rpa/up', RpaUp.as_view(), name='rpa.input'),
+    path('rpa/down', RpaDown.as_view(), name='rpa.down'),
+    path('rpa/active', RpaActive.as_view(), name='rpa.active'),
 ]
