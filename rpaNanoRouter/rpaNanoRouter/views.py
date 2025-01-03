@@ -9,9 +9,11 @@ from .libs.docker import Docker
 class RpaUp(APIView):
     
     def get(self, request):
+        # Container path
+        container_path = os.getenv('CONTAINER_PATH')
         # Read path parameters
         app_name = request.query_params.get("app_name", None)
-        filename = f"./containers/{app_name}/docker-compose.yaml"
+        filename = f"./{container_path}/{app_name}/docker-compose.yaml"
         try:
             subprocess.run(["docker-compose", "-f", filename, "up", "-d"], check=True)
         except subprocess.CalledProcessError as e:
@@ -21,8 +23,11 @@ class RpaUp(APIView):
 # Shut down the container
 class RpaDown(APIView):
     def get(self, request):
+        # Container path
+        container_path = os.getenv('CONTAINER_PATH')
+        # Read app_name parameter
         app_name = request.query_params.get("app_name", None)
-        filename = f"./containers/{app_name}/docker-compose.yaml"
+        filename = f"./{container_path}/{app_name}/docker-compose.yaml"
         try:
             subprocess.run(["docker-compose", "-f", filename, "down"], check=True)
         except subprocess.CalledProcessError as e:

@@ -1,5 +1,6 @@
 # Database
 db.sqlite3
+.env
 
 # Cache
 rpaNanoRouter/__pycache__/
