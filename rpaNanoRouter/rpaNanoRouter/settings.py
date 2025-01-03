@@ -22,6 +22,7 @@ dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
 load_dotenv(dotenv_path)
 # Load environment variables
 prod_frontend_url = os.getenv('PRODUCTION_FRONTEND_URL')
+prod_domain = os.getenv('PRODUCTION_DOMAIN')
 
 
 # Quick-start development settings - unsuitable for production
@@ -34,7 +35,7 @@ SECRET_KEY = 'django-insecure-_h^z1#woh9=f4uclgdmnjc+kau&-trgznqhin%k#)%xz(d^ie0
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    prod_frontend_url,
+    prod_domain,
 ]
 
 
