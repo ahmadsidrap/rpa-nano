@@ -20,7 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load .env file
 dotenv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
 load_dotenv(dotenv_path)
-container_path = os.getenv('CONTAINER_PATH')
+# Load environment variables
+prod_frontend_url = os.getenv('PRODUCTION_FRONTEND_URL')
 
 
 # Quick-start development settings - unsuitable for production
@@ -62,6 +63,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3063",
+    prod_frontend_url,
 ]
 
 ROOT_URLCONF = 'rpaNanoRouter.urls'
