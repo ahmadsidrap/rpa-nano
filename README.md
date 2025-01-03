@@ -9,23 +9,25 @@ RPA for nano services
 
 RPA Router is an API to handle request.
 
-### Run the server
+## Installation
 
-```bash
-cd rpaNanoRouter
-python manage.py runserver
-```
-
-### DB migration
+### Step 1 - DB migration
 
 ```bash
 python manage.py migrate
 ```
 
-### Create superuser
+### Step 2 - Create superuser
 
 ```bash
 python manage.py createsuperuser
+```
+
+### Step 3 - Run the server
+
+```bash
+cd rpaNanoRouter
+python manage.py runserver
 ```
 
 ## APIs
