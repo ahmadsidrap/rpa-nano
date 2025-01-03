@@ -1,3 +1,4 @@
 django==2.2.4
 django-cors-headers
 python-dotenv
+djangorestframework
