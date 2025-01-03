@@ -27,11 +27,11 @@ from .views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('rpa/up', RpaUp.as_view(), name='rpa.input'),
-    path('rpa/down', RpaDown.as_view(), name='rpa.down'),
-    path('rpa/container', RpaContainer.as_view(), name='rpa.container'),
-    path('rpa/active', RpaActive.as_view(), name='rpa.active'),
-    path('rpa/image', RpaImage.as_view(), name='rpa.image'),
-    path('rpa/volume', RpaVolume.as_view(), name='rpa.volume'),
-    path('rpa/copy', RpaCopy.as_view(), name='rpa.copy'),
+    path('api/rpa/up', RpaUp.as_view(), name='rpa.input'),
+    path('api/rpa/down', RpaDown.as_view(), name='rpa.down'),
+    path('api/rpa/container', RpaContainer.as_view(), name='rpa.container'),
+    path('api/rpa/active', RpaActive.as_view(), name='rpa.active'),
+    path('api/rpa/image', RpaImage.as_view(), name='rpa.image'),
+    path('api/rpa/volume', RpaVolume.as_view(), name='rpa.volume'),
+    path('api/rpa/copy', RpaCopy.as_view(), name='rpa.copy'),
 ]
