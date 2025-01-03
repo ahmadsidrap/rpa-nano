@@ -18,6 +18,7 @@ from django.urls import include, path
 from .views import (
     RpaUp,
     RpaDown,
+    RpaContainer,
     RpaActive,
     RpaImage,
     RpaVolume,
@@ -28,6 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('rpa/up', RpaUp.as_view(), name='rpa.input'),
     path('rpa/down', RpaDown.as_view(), name='rpa.down'),
+    path('rpa/container', RpaContainer.as_view(), name='rpa.container'),
     path('rpa/active', RpaActive.as_view(), name='rpa.active'),
     path('rpa/image', RpaImage.as_view(), name='rpa.image'),
     path('rpa/volume', RpaVolume.as_view(), name='rpa.volume'),

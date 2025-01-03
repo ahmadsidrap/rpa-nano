@@ -34,6 +34,16 @@ class RpaDown(APIView):
             return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         return Response({"message": "Success"})
 
+# Get all containers
+class RpaContainer(APIView):
+    def get(self, request):
+        docker = Docker()
+        try:
+            data = docker.get_containers()
+        except subprocess.CalledProcessError as e:
+            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
+        return Response({"message": "Success", "data": data})
+
 # Get active containers
 class RpaActive(APIView):
     def get(self, request):
