@@ -7,7 +7,13 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const navItems: any[] = [];
+interface NavItem {
+  href: string;
+  title: string;
+  target?: string;
+}
+
+const navItems: NavItem[] = [];
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
