@@ -62,7 +62,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3063",
+    "http://localhost:3064",
     prod_frontend_url,
 ]
 

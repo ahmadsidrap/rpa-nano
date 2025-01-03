@@ -6,5 +6,5 @@ services:
       - .:/app
       - ./node_modules:/app/node_modules
     ports:
-      - '3062:3000'
+      - '3065:3000'
     command: sh -c "npm install && npm run build"

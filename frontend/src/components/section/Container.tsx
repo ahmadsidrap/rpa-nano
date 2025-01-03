@@ -15,7 +15,7 @@ export default function Container() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch("http://localhost:3002/rpa/container");
+        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/rpa/container");
         const result = await response.json();
         setData(result.data);
       } catch (error) {
