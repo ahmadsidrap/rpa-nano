@@ -1,4 +1,3 @@
-import subprocess
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .libs.docker.executor import Executor as Docker
@@ -24,6 +23,8 @@ class RpaNlp(APIView):
         data = []
         try:
             data = docker.execute_command(command, target, token_related_target, cmd_data)
+            if isinstance(data, str):
+                data = [{"Output": data}]
         except Exception as e:
             status = 500
             if hasattr(e, 'stderr') and e.stderr:

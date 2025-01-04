@@ -5,6 +5,22 @@ import os
 # Define the Executor class
 class Executor:
 
+    debug_mode = False
+
+    def __init__(self):
+        self.debug_mode = os.getenv('DEBUG_MODE', 'false').lower() == 'true'
+
+    def subprocess_run(self, command, check=True, capture_output=True, text=True):
+        """
+        Run a subprocess command.
+        """
+        if self.debug_mode:
+            command_str = ' '.join(command)
+            print(f"Execute command: {command_str}")
+            return f"Execute command: {command_str}"
+        else:
+            return subprocess.run(command, check=check, capture_output=capture_output, text=text)
+
     def execute_command(self, command, target, token_related_target, cmd_data):
         """
         Execute the specified command on the target container.
@@ -47,14 +63,21 @@ class Executor:
         """
         Copy data from the source container to the target container.
         """
-        images = self.get_active(True)
+        if not self.debug_mode:
+            images = self.get_active(True)
 
-        # Get the source and destination containers
-        containerDst = images[f"rpa-{target}"]
-        idDst = containerDst["ID"]
-        pathSrc = f"./shared/{source}"
-        pathDst = f"{idDst}:/{path}"
-        subprocess.run(["docker", "cp", pathSrc, pathDst], check=True, capture_output=True, text=True)
+            # Get the source and destination containers
+            containerDst = images[f"rpa-{target}"]
+            idDst = containerDst["ID"]
+            pathSrc = f"./shared/{source}"
+            pathDst = f"{idDst}:/{path}"
+        else:
+            pathSrc = f"./shared/{source}"
+            pathDst = f"{target}:/{path}"
+
+        result = self.subprocess_run(["docker", "cp", pathSrc, pathDst], check=True, capture_output=True, text=True)
+        if self.debug_mode:
+            return result
         
         return f"File copied from {source} to {target} successfully."
     
@@ -62,7 +85,9 @@ class Executor:
         """
         Get the list of Docker images.
         """
-        result = subprocess.run(["docker", "image", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        result = self.subprocess_run(["docker", "image", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        if self.debug_mode and not hasattr(result, 'stdout'):
+            return result
         data = [
             {
                 "Repository": image["Repository"],
@@ -79,7 +104,9 @@ class Executor:
         """
         Get the list of Docker volumes.
         """
-        result = subprocess.run(["docker", "volume", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        result = self.subprocess_run(["docker", "volume", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        if self.debug_mode and not hasattr(result, 'stdout'):
+            return result
         data = [
             {
                 "Driver": volume["Driver"],
@@ -99,7 +126,9 @@ class Executor:
         # Container path
         container_path = os.getenv('CONTAINER_PATH')
         filename = f"./{container_path}/{name}/docker-compose.yaml"
-        subprocess.run(["docker-compose", "-f", filename, "up", "-d"], check=True)
+        result = self.subprocess_run(["docker-compose", "-f", filename, "up", "-d"], check=True)
+        if self.debug_mode:
+            return result
 
         return f"Container {name} started successfully."
     
@@ -110,13 +139,17 @@ class Executor:
         # Container path
         container_path = os.getenv('CONTAINER_PATH')
         filename = f"./{container_path}/{name}/docker-compose.yaml"
-        subprocess.run(["docker-compose", "-f", filename, "down"], check=True)
+        result = self.subprocess_run(["docker-compose", "-f", filename, "down"], check=True)
+        if self.debug_mode:
+            return result
 
         return f"Container {name} started successfully"
 
     # Get all containers
     def get_containers(self, useKey=False):
-        result = subprocess.run(["docker", "ps", "-a", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        result = self.subprocess_run(["docker", "ps", "-a", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        if self.debug_mode and not hasattr(result, 'stdout'):
+            return result
         if not useKey:
             data = [
                 {
@@ -148,7 +181,9 @@ class Executor:
 
     # Get active containers
     def get_active(self, useKey=False):
-        result = subprocess.run(["docker", "ps", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        result = self.subprocess_run(["docker", "ps", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        if self.debug_mode and not hasattr(result, 'stdout'):
+            return result
         if not useKey:
             data = [
                 {
@@ -182,7 +217,9 @@ class Executor:
         """
         Get the list of inactive (stopped) containers.
         """
-        result = subprocess.run(["docker", "ps", "-a", "--filter", "status=exited", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        result = self.subprocess_run(["docker", "ps", "-a", "--filter", "status=exited", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        if self.debug_mode and not hasattr(result, 'stdout'):
+            return result
         if not useKey:
             data = [
                 {
