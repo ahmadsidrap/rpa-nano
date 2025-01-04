@@ -28,9 +28,9 @@ class Executor:
         data = []
         if command == 'show':
             if target == 'container':
-                if 'active' in token_related_target:
+                if any(keyword in token_related_target for keyword in ['active', 'run']):
                     data = self.get_active()
-                elif 'inactive' in token_related_target:
+                elif any(keyword in token_related_target for keyword in ['inactive', 'exit']):
                     data = self.get_inactive()
                 else:
                     data = self.get_containers()
