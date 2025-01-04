@@ -143,7 +143,7 @@ class Executor:
         if self.debug_mode:
             return result
 
-        return f"Container {name} started successfully"
+        return f"Container {name} stopped successfully"
 
     # Get all containers
     def get_containers(self, useKey=False):
