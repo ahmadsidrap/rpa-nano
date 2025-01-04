@@ -20,9 +20,14 @@ class RpaNlp(APIView):
 
         docker = Docker()
 
+        status = 200
         data = []
         try:
             data = docker.execute_command(command, target, token_related_target, cmd_data)
-        except subprocess.CalledProcessError as e:
-            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
-        return Response({"message": "Success", "data": data})
+        except Exception as e:
+            status = 500
+            if hasattr(e, 'stderr') and e.stderr:
+                data = [{"Error": str(e.stderr)}]
+            else:
+                data = [{"Error": str(e)}]
+        return Response({"data": data}, status=status)

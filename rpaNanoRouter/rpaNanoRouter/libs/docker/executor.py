@@ -25,7 +25,7 @@ class Executor:
             elif target == 'image' or target == 'images':
                 data = self.get_images()
             else:
-                raise ValueError(f"Unknown target: {target}")
+                raise ValueError(f"Unknown target.")
 
         elif command == 'down':
             data = self.stop_container(target)
@@ -39,7 +39,7 @@ class Executor:
             data = self.copy_data(target, source, path)
 
         else:
-            raise ValueError(f"Unknown command: {command}")
+            raise ValueError(f"Unknown command.")
 
         return data
     
