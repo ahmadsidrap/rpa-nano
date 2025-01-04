@@ -51,7 +51,12 @@ class Nlp:
         """
         # Parse the text using spaCy
         doc = self.nlp(text.lower())
-        data = {}
+        data = {
+            'command': None,
+            'related_tokens': [],
+            'source': None,
+            'target': None,
+        }
 
         # Find the root verb of the sentence
         original_command_word = None
@@ -112,7 +117,6 @@ class Nlp:
             
         if data["command"] is not None:
             # Find the tokens related to the target noun
-            data["related_tokens"] = []
             for token in doc:
                 if token.head.lemma_ == data["target"]:
                     data["related_tokens"].append(token.lemma_)
