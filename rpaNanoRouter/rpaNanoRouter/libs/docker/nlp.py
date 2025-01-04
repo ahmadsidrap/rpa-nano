@@ -118,7 +118,7 @@ class Nlp:
         if command is not None:
             # Find the tokens related to the target noun
             for token in doc:
-                if token.head.text == target:
+                if token.head.lemma_ == target:
                     token_related_target.append(token.text)
         if self.debug_mode or self.debug_test:
             print("Command:", command, "Target:", target, "Tokens:", token_related_target, "Data: ", data)
