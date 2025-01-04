@@ -22,7 +22,8 @@ from .views import (
     RpaActive,
     RpaImage,
     RpaVolume,
-    RpaCopy
+    RpaCopy,
+    RpaNlp,
 )
 
 urlpatterns = [
@@ -34,4 +35,5 @@ urlpatterns = [
     path('api/rpa/image', RpaImage.as_view(), name='rpa.image'),
     path('api/rpa/volume', RpaVolume.as_view(), name='rpa.volume'),
     path('api/rpa/copy', RpaCopy.as_view(), name='rpa.copy'),
+    path('api/rpa/nlp', RpaNlp.as_view(), name='rpa.nlp'),
 ]

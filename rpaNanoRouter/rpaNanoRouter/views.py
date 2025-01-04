@@ -4,6 +4,7 @@ import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .libs.docker import Docker
+from .libs.nlp import Nlp
 
 # Start the container
 class RpaUp(APIView):
@@ -117,4 +118,32 @@ class RpaCopy(APIView):
         data = {
             "destination": containerDst["ID"],
         }
+        return Response({"message": "Success", "data": data})
+    
+class RpaNlp(APIView):
+    def get(self, request):
+        """
+        Process the input text using spaCy.
+        """
+        # Load NLP library
+        nlp = Nlp()
+        
+        # Get the text from the request
+        message = request.query_params.get("msg", None)
+        # Process the text
+        command, target, token_related_target = nlp.process_command(message)
+        print("Command:", command, "Target:", target, "Tokens:", token_related_target)
+
+        docker = Docker()
+        data = []
+        try:
+            # Execute command show container
+            if (command == 'show' and (target == 'container' or target == 'containers')):
+                if 'active' in token_related_target:
+                    data = docker.get_active()
+                else:
+                    data = docker.get_containers()
+        except subprocess.CalledProcessError as e:
+            return Response({"message": "Error", "error": str(e.stderr)}, status=500)
+
         return Response({"message": "Success", "data": data})
