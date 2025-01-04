@@ -79,27 +79,17 @@ class RpaVolume(APIView):
 class RpaCopy(APIView):
     def get(self, request):
         # Get active containers
-        docker = Docker()
-        data = docker.get_active(True)
-
-        # Get the source and destination containers
+        
         container = request.query_params.get("container", None)
         source = request.query_params.get("src", None)
         destination = request.query_params.get("dst", None)
-        containerDst = data[f"rpa-{container}"]
-        idDst = containerDst["ID"]
-        pathSrc = f"./shared/{source}"
-        pathDst = f"{idDst}:/{destination}"
 
+        data = []
         try:
             # Copy the data
-            subprocess.run(["docker", "cp", pathSrc, pathDst], check=True, capture_output=True, text=True)
+            data = Docker().copy_data(container, source, destination)
         except subprocess.CalledProcessError as e:
             return Response({"message": "Error", "error": str(e.stderr)}, status=500)
-
-        data = {
-            "destination": containerDst["ID"],
-        }
         return Response({"message": "Success", "data": data})
     
 class RpaNlp(APIView):
@@ -113,14 +103,14 @@ class RpaNlp(APIView):
         # Get the text from the request
         message = request.query_params.get("msg", None)
         # Process the text
-        command, target, token_related_target = nlp.process_command(message)
-        print("Command:", command, "Target:", target, "Tokens:", token_related_target)
+        command, target, token_related_target, cmd_data = nlp.process_command(message)
+        print("Command:", command, "Target:", target, "Tokens:", token_related_target, "Data: ", cmd_data)
 
         docker = Docker()
 
         data = []
         try:
-            data = docker.execute_command(command, target, token_related_target)
+            data = docker.execute_command(command, target, token_related_target, cmd_data)
         except subprocess.CalledProcessError as e:
             return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         return Response({"message": "Success", "data": data})

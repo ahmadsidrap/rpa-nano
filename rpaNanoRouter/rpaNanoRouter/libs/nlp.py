@@ -7,6 +7,7 @@ class Nlp:
         "show": ["show", "display"],
         "up": ["start"],
         "down": ["shut", "stop"],
+        "copy": ["copy", "transfer"],
     }
 
     # Inverted dictionary to map the command tokens to the root verb
@@ -50,7 +51,8 @@ class Nlp:
         command = None
         original_command_word = None
         for token in doc:
-            print("Analyze tokens:", token.text, token.pos_, token.dep_, token.head.text)
+            print("text:", token.text, ", pos:", token.pos_, ", dep:", token.dep_, ", head:", token.head.text)
+            
             # Check for named entities
             if token.text in self.command_map:
                 original_command_word = token.text
@@ -59,6 +61,7 @@ class Nlp:
         # Find the noun chunks in the sentence
         target = None
         token_related_target = []
+        data = {}
 
         # If the command is 'show', find the target noun and related tokens
         if command == 'show':
@@ -82,6 +85,17 @@ class Nlp:
                 # Reponse to command: "stop container x"
                 elif not has_punct and token.pos_ == 'NOUN' and token.head.text == original_command_word:
                     target = token.text
+
+        elif command == 'copy':
+            data["source"] = None
+            for token in doc:
+                # Source
+                if token.pos_ == 'ADJ' and token.head.text == original_command_word:
+                    data["source"] = token.text
+                elif token.pos_ == 'PUNCT' and token.head.text == original_command_word:
+                    data["path"] = token.text
+                if token.pos_ == 'NOUN' and token.head.text == "into":
+                    target = token.text
             
         if command is not None:
             # Find the tokens related to the target noun
@@ -89,4 +103,4 @@ class Nlp:
                 if token.head.text == target:
                     token_related_target.append(token.text)
 
-        return command, target, token_related_target
+        return command, target, token_related_target, data

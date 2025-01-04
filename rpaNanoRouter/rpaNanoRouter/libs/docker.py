@@ -5,7 +5,7 @@ import os
 # Define the Docker class
 class Docker:
 
-    def execute_command(self, command, target, token_related_target):
+    def execute_command(self, command, target, token_related_target, cmd_data):
         """
         Execute the specified command on the target container.
         """
@@ -31,9 +31,32 @@ class Docker:
         elif command == 'up':
             data = self.start_container(target)
 
+        elif command == 'copy':
+            source = cmd_data["source"]
+            path = cmd_data["path"]
+            data = self.copy_data(target, source, path)
+
         else:
             raise ValueError(f"Unknown command: {command}")
 
+        return data
+    
+    def copy_data(self, target, source, path):
+        """
+        Copy data from the source container to the target container.
+        """
+        images = self.get_active(True)
+
+        # Get the source and destination containers
+        containerDst = images[f"rpa-{target}"]
+        idDst = containerDst["ID"]
+        pathSrc = f"./shared/{source}"
+        pathDst = f"{idDst}:/{path}"
+        subprocess.run(["docker", "cp", pathSrc, pathDst], check=True, capture_output=True, text=True)
+
+        data = {
+            "destination": containerDst["ID"],
+        }
         return data
     
     def get_images(self):
