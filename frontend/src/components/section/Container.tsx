@@ -53,15 +53,19 @@ export default function Container() {
         </div>
       </form>
       <div className="flex flex-col gap-4 py-4">
-      {data.map((item, i) => (
-        <div key={i} className="border rounded p-2">
-          {Object.entries(item).map(([key, value]) => (
-            <p key={key} className="text-sm text-muted-foreground">
-              <b>{key}:</b> {value as string}
-            </p>
-          ))}
-        </div>
-      ))}
+      {typeof data === "string" ? (
+        <p className="text-sm text-muted-foreground">{data}</p>
+      ) : (
+        data.map((item, i) => (
+          <div key={i} className="border rounded p-2">
+            {Object.entries(item).map(([key, value]) => (
+              <p key={key} className="text-sm text-muted-foreground">
+                <b>{key}:</b> {value as string}
+              </p>
+            ))}
+          </div>
+        ))
+      )}
       </div>
     </div>
   );

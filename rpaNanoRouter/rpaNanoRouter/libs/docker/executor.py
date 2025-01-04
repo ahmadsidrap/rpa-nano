@@ -55,11 +55,8 @@ class Executor:
         pathSrc = f"./shared/{source}"
         pathDst = f"{idDst}:/{path}"
         subprocess.run(["docker", "cp", pathSrc, pathDst], check=True, capture_output=True, text=True)
-
-        data = {
-            "destination": containerDst["ID"],
-        }
-        return data
+        
+        return f"File copied from {source} to {target} successfully."
     
     def get_images(self):
         """
@@ -103,7 +100,8 @@ class Executor:
         container_path = os.getenv('CONTAINER_PATH')
         filename = f"./{container_path}/{name}/docker-compose.yaml"
         subprocess.run(["docker-compose", "-f", filename, "up", "-d"], check=True)
-        return True
+
+        return f"Container {name} started successfully."
     
     def stop_container(self, name):
         """
@@ -113,7 +111,8 @@ class Executor:
         container_path = os.getenv('CONTAINER_PATH')
         filename = f"./{container_path}/{name}/docker-compose.yaml"
         subprocess.run(["docker-compose", "-f", filename, "down"], check=True)
-        return True
+
+        return f"Container {name} started successfully"
 
     # Get all containers
     def get_containers(self, useKey=False):
