@@ -1,11 +1,12 @@
 import spacy
+import os
 
 class Nlp:
 
     # Command dictionary to map the root verb to the command tokens
     command_dictionary = {
         "show": ["show", "display", "list", "get", "obtain", "view", "fetch"],
-        "up": ["start"],
+        "up": ["start", "run", "begin", "launch"],
         "down": ["shut", "stop"],
         "copy": ["copy", "transfer"],
     }
@@ -13,7 +14,11 @@ class Nlp:
     # Inverted dictionary to map the command tokens to the root verb
     command_map = {}
 
-    def __init__(self):
+    def __init__(self, debug_test=False):
+        # Load the environment variables
+        self.debug_mode = os.getenv('DEBUG_MODE', 'false').lower() == 'true'
+        self.debug_test = debug_test
+
         # Load the spaCy English language model
         self.nlp = spacy.load("en_core_web_sm")
 
@@ -51,7 +56,8 @@ class Nlp:
         command = None
         original_command_word = None
         for token in doc:
-            print("text:", token.text, ", pos:", token.pos_, ", dep:", token.dep_, ", head:", token.head.text)
+            if self.debug_mode or self.debug_test:
+                print("text:", token.text, ", pos:", token.pos_, ", dep:", token.dep_, ", head:", token.head.text)
             
             # Check for named entities
             if token.text in self.command_map:
