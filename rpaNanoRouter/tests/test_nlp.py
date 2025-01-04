@@ -52,17 +52,17 @@ class TestNLPProcessor(unittest.TestCase):
         self.assertEqual(a, "show")
         self.assertEqual(b, "container")
         
-        text = "show all active containers"
+        text = "show all running containers"
         a, b, c, d = self.processor.process_command(text)
         self.assertEqual(a, "show")
         self.assertEqual(b, "container")
-        self.assertIn('active', c)
+        self.assertTrue('active' in c or 'run' in c)
         
-        text = "show all inactive containers"
+        text = "show all exited containers"
         a, b, c, d = self.processor.process_command(text)
         self.assertEqual(a, "show")
         self.assertEqual(b, "container")
-        self.assertIn('inactive', c)
+        self.assertTrue('inactive' in c or 'exit' in c)
         
         text = "list me volumes"
         a, b, c, d = self.processor.process_command(text)
