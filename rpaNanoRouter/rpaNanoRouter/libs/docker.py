@@ -10,17 +10,64 @@ class Docker:
         Execute the specified command on the target container.
         """
         data = []
-        if (command == 'show' and (target == 'container' or target == 'containers')):
-            if 'active' in token_related_target:
-                data = self.get_active()
+        if command == 'show':
+            if target == 'container' or target == 'containers':
+                if 'active' in token_related_target:
+                    data = self.get_active()
+                else:
+                    data = self.get_containers()
+
+            elif target == 'volume' or target == 'volumes':
+                data = self.get_volumes()
+
+            elif target == 'image' or target == 'images':
+                data = self.get_images()
             else:
-                data = self.get_containers()
+                raise ValueError(f"Unknown target: {target}")
 
         elif command == 'down':
             data = self.stop_container(target)
 
         elif command == 'up':
             data = self.start_container(target)
+
+        else:
+            raise ValueError(f"Unknown command: {command}")
+
+        return data
+    
+    def get_images(self):
+        """
+        Get the list of Docker images.
+        """
+        result = subprocess.run(["docker", "image", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        data = [
+            {
+                "Repository": image["Repository"],
+                "Tag": image["Tag"],
+                "ID": image["ID"],
+                "CreatedSince": image["CreatedSince"],
+                "Size": image["Size"]
+            }
+            for image in (json.loads(line) for line in result.stdout.splitlines())
+        ]
+        return data
+    
+    def get_volumes(self):
+        """
+        Get the list of Docker volumes.
+        """
+        result = subprocess.run(["docker", "volume", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        data = [
+            {
+                "Driver": volume["Driver"],
+                "Labels": volume["Labels"],
+                "Mountpoint": volume["Mountpoint"],
+                "Name": volume["Name"],
+                "Scope": volume["Scope"]
+            }
+            for volume in (json.loads(line) for line in result.stdout.splitlines())
+        ]
         return data
     
     def start_container(self, name):

@@ -38,9 +38,9 @@ class RpaDown(APIView):
 # Get all containers
 class RpaContainer(APIView):
     def get(self, request):
-        docker = Docker()
+        data = []
         try:
-            data = docker.get_containers()
+            data = Docker().get_containers()
         except subprocess.CalledProcessError as e:
             return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         return Response({"message": "Success", "data": data})
@@ -48,9 +48,9 @@ class RpaContainer(APIView):
 # Get active containers
 class RpaActive(APIView):
     def get(self, request):
-        docker = Docker()
+        data = []
         try:
-            data = docker.get_active()
+            data = Docker().get_active()
         except subprocess.CalledProcessError as e:
             return Response({"message": "Error", "error": str(e.stderr)}, status=500)
         return Response({"message": "Success", "data": data})
@@ -58,39 +58,21 @@ class RpaActive(APIView):
 # Get images
 class RpaImage(APIView):
     def get(self, request):
+        data = []
         try:
-            result = subprocess.run(["docker", "image", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+            data = Docker().get_images()
         except subprocess.CalledProcessError as e:
             return Response({"message": "Error", "error": str(e.stderr)}, status=500)
-        data = [
-            {
-                "Repository": image["Repository"],
-                "Tag": image["Tag"],
-                "ID": image["ID"],
-                "CreatedSince": image["CreatedSince"],
-                "Size": image["Size"]
-            }
-            for image in (json.loads(line) for line in result.stdout.splitlines())
-        ]
         return Response({"message": "Success", "data": data})
 
 # Get volumes
 class RpaVolume(APIView):
     def get(self, request):
+        data = []
         try:
-            result = subprocess.run(["docker", "volume", "ls", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+            data = Docker().get_volumes()
         except subprocess.CalledProcessError as e:
             return Response({"message": "Error", "error": str(e.stderr)}, status=500)
-        data = [
-            {
-                "Driver": volume["Driver"],
-                "Labels": volume["Labels"],
-                "Mountpoint": volume["Mountpoint"],
-                "Name": volume["Name"],
-                "Scope": volume["Scope"]
-            }
-            for volume in (json.loads(line) for line in result.stdout.splitlines())
-        ]
         return Response({"message": "Success", "data": data})
     
 # Copy data
