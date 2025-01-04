@@ -14,25 +14,15 @@ export default function Container() {
   
   useEffect(() => {
     async function fetchData() {
-      try {
-        const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/api/rpa/container");
-        const result = await response.json();
-        setData(result.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+      sendCommand("show active containers");
     }
 
     fetchData();
   }, []);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const message = formData.get("message");
-  
+  async function sendCommand(message: string) {
     try {
-      const url = process.env.NEXT_PUBLIC_API_URL + "/api/rpa/nlp?msg=" + message;
+      const url = process.env.NEXT_PUBLIC_API_URL + "/api/rpa/nlp";
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -45,6 +35,13 @@ export default function Container() {
     } catch (error) {
       console.error("Error sending message:", error);
     }
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    const message = formData.get("message");
+    sendCommand(message as string);
   }
 
   return (
