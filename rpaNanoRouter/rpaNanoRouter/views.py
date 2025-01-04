@@ -1,7 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .libs.docker.executor import Executor as Docker
-from .libs.docker.nlp import Nlp
+from .libs.cli.executor import Executor as CliExecutor
+from .libs.cli.nlp import Nlp as CliNlp
+from .libs.docker.executor import Executor as DockerExecutor
+from .libs.docker.nlp import Nlp as DockerNlp
     
 class RpaNlp(APIView):
     def post(self, request):
@@ -9,14 +11,14 @@ class RpaNlp(APIView):
         Process the input text using spaCy.
         """
         # Load NLP library
-        nlp = Nlp()
+        nlp = CliNlp()
         
         # Get the text from the request
         message = request.data.get("message", None)
         # Process the text
         cmd_data = nlp.process_command(message)
 
-        docker = Docker()
+        docker = CliExecutor()
         status = 200
         data = []
         try:
