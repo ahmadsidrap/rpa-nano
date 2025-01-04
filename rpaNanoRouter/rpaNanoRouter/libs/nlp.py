@@ -2,9 +2,20 @@ import spacy
 
 class Nlp:
 
+    # Command dictionary to map the root verb to the command tokens
+    command_dictionary = {
+        "show": ["show", "display"],
+    }
+
+    # Inverted dictionary to map the command tokens to the root verb
+    command_map = {}
+
     def __init__(self):
         # Load the spaCy English language model
         self.nlp = spacy.load("en_core_web_sm")
+
+        # Indexing command dictionary
+        self.command_map = self.command_dictionary_index()
 
     def process_text(self, text):
         """
@@ -15,6 +26,16 @@ class Nlp:
         verbs = [token.lemma_ for token in doc if token.pos_ == "VERB"]
         entities = [(entity.text, entity.label_) for entity in doc.ents]
         return noun_phrases, verbs, entities
+    
+    def command_dictionary_index(self):
+        """
+        Create an inverted dictionary to map the command tokens to the root verb
+        """
+        inverted_dict = {}
+        for key, values in self.command_dictionary.items():
+            for value in values:
+                inverted_dict[value] = key
+        return inverted_dict
 
     def process_command(self, text):
         """
@@ -25,11 +46,13 @@ class Nlp:
 
         # Find the root verb of the sentence
         command = None
+        original_command_word = None
         for token in doc:
             print("Analyze tokens:", token.text, token.pos_, token.dep_, token.head.text)
             # Check for named entities
-            if token.text == 'show' and token.dep_ == 'ROOT':
-                command = token.text
+            if token.text in self.command_map:
+                original_command_word = token.text
+                command = self.command_map[token.text]
 
         # Find the noun chunks in the sentence
         target = None
@@ -37,7 +60,7 @@ class Nlp:
         if command == 'show':
             for token in doc:
                 # Check for nouns related to the root verb
-                if token.pos_ == 'NOUN' and token.head.text == command:
+                if token.pos_ == 'NOUN' and token.head.text == original_command_word:
                     target = token.text
                     break
             
