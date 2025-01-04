@@ -73,7 +73,7 @@ class Nlp:
         if command == 'show':
             for token in doc:
                 # Check for nouns related to the root verb
-                if token.pos_ == 'NOUN' and token.head.text == original_command_word:
+                if token.pos_ == 'NOUN' and token.head.text == original_command_word and token.dep_ != 'ROOT':
                     target = token.lemma_
                     break
                 elif token.dep_ == 'ROOT' and token.head.text != token.text:

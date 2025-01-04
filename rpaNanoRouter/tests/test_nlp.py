@@ -58,7 +58,7 @@ class TestNLPProcessor(unittest.TestCase):
         self.assertEqual(b, "container")
         self.assertTrue('active' in c or 'run' in c)
         
-        text = "show all exited containers"
+        text = "show exited containers"
         a, b, c, d = self.processor.process_command(text)
         self.assertEqual(a, "show")
         self.assertEqual(b, "container")
