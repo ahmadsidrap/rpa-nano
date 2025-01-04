@@ -74,7 +74,10 @@ class Nlp:
             for token in doc:
                 # Check for nouns related to the root verb
                 if token.pos_ == 'NOUN' and token.head.text == original_command_word:
-                    target = token.text
+                    target = token.lemma_
+                    break
+                elif token.dep_ == 'ROOT' and token.head.text != token.text:
+                    target = token.lemma_
                     break
 
         elif command == 'up' or command == 'down':
@@ -94,12 +97,21 @@ class Nlp:
 
         elif command == 'copy':
             data["source"] = None
+
             for token in doc:
                 # Source
-                if (token.dep_ == 'advmod' or token.dep_ == 'oprd' or token.dep_ == 'appos') and token.head.text == original_command_word:
+                if token.dep_ in {'advmod', 'oprd', 'appos', 'npadvmod'} and token.head.text == original_command_word:
                     data["source"] = token.text
+                elif data['source'] is None and token.pos_ == 'ADP' and token.dep_ == 'prep' and token.head.text == original_command_word: # Response to /x/x/x/x
+                    data["source"] = self.get_connected_token_until_similar(doc, token)
+
+                # Get the path
                 elif token.pos_ == 'PUNCT' and token.head.text == original_command_word:
                     data["path"] = token.text
+                elif token.pos_ == 'PUNCT' and token.head.text == 'in': # Reponse to /x/x/x/x
+                    data["path"] = doc[token.i:].text
+                    break
+
                 if token.pos_ == 'NOUN' and token.head.pos_ == "ADP" and token.head.head.text == original_command_word:
                     target = token.text
             
@@ -108,5 +120,18 @@ class Nlp:
             for token in doc:
                 if token.head.text == target:
                     token_related_target.append(token.text)
+        if self.debug_mode or self.debug_test:
+            print("Command:", command, "Target:", target, "Tokens:", token_related_target, "Data: ", data)
 
         return command, target, token_related_target, data
+    
+    def get_connected_token_until_similar(self, doc, token):
+        """
+        Get connected tokens
+        """
+        str = ''
+        for next_token in doc[token.i+1:]:
+            str += next_token.text
+            if next_token.head.text == token.text:
+                break
+        return str

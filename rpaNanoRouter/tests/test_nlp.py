@@ -46,6 +46,54 @@ class TestNLPProcessor(unittest.TestCase):
         a, b, c, d = self.processor.process_command(text)
         self.assertEqual(a, "show")
         self.assertEqual(b, "container")
+        
+        text = "list me container"
+        a, b, c, d = self.processor.process_command(text)
+        self.assertEqual(a, "show")
+        self.assertEqual(b, "container")
+        
+        text = "list me volumes"
+        a, b, c, d = self.processor.process_command(text)
+        self.assertEqual(a, "show")
+        self.assertEqual(b, "volume")
+        
+        text = "obtain all the images"
+        a, b, c, d = self.processor.process_command(text)
+        self.assertEqual(a, "show")
+        self.assertEqual(b, "image")
+        
+        text = "please fetch the images for me"
+        a, b, c, d = self.processor.process_command(text)
+        self.assertEqual(a, "show")
+        self.assertEqual(b, "image")
+
+    def test_copy(self):
+        """
+        Test the copy command.
+        """
+        text = "please transfer file test.txt into container git in /home"
+        a, b, c, d = self.processor.process_command(text)
+        self.assertEqual(a, "copy")
+        self.assertEqual(b, "git")
+        self.assertEqual(c, ['container'])
+        self.assertEqual(d['source'], 'test.txt')
+        self.assertEqual(d['path'], '/home')
+        
+        text = "please transfer file test.txt into container git in /home/data/db/mysql"
+        a, b, c, d = self.processor.process_command(text)
+        self.assertEqual(a, "copy")
+        self.assertEqual(b, "git")
+        self.assertEqual(c, ['container', 'in'])
+        self.assertEqual(d['source'], 'test.txt')
+        self.assertEqual(d['path'], '/home/data/db/mysql')
+        
+        text = "please transfer file at src/data/test.txt into container git in /home"
+        a, b, c, d = self.processor.process_command(text)
+        self.assertEqual(a, "copy")
+        self.assertEqual(b, "git")
+        self.assertEqual(c, ['container'])
+        self.assertEqual(d['source'], 'src/data/test.txt')
+        self.assertEqual(d['path'], '/home')
 
 if __name__ == '__main__':
     unittest.main()
