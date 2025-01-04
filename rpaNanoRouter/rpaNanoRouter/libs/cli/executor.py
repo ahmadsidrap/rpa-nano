@@ -1,3 +1,4 @@
+import datetime
 import json
 import subprocess
 import os
@@ -9,6 +10,7 @@ class Executor:
 
     def __init__(self):
         self.debug_mode = os.getenv('DEBUG_MODE', 'false').lower() == 'true'
+        self.container_id = os.getenv('CONTAINER_ID', '')
 
     def subprocess_run(self, command):
         """
@@ -22,7 +24,11 @@ class Executor:
             print(f"Execute command: {command_str}")
             return f"Execute command: {command_str}"
         else:
-            return subprocess.run(command, check=check, capture_output=capture_output, text=text)
+            commands = ['docker', 'exec', '-ti', self.container_id]
+            commands.extend(command)
+            result = subprocess.run(commands, check=check, capture_output=capture_output, text=text)
+            # result = subprocess.run(command, check=check, capture_output=capture_output, text=text)
+            return result.stdout
 
     def execute_command(self, cmd_data):
         """
@@ -36,6 +42,14 @@ class Executor:
         return data
         
     def command_date(self):
-        return self.subprocess_run(['date'])
+        # Get the current date and time
+        date_string = self.subprocess_run(['date']).strip()
+        timezone_string = self.subprocess_run(['date', '+%Z']).strip()
+        # Convert to datetime object
+        dt_object = datetime.datetime.strptime(date_string, "%a %b %d %H:%M:%S UTC %Y")
+
+        # Format as desired
+        formatted_date = dt_object.strftime(f"%Y-%m-%d %H:%M:%S {timezone_string}")
+        return formatted_date
     
     
