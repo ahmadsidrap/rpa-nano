@@ -3,14 +3,7 @@
 import { useEffect, useState } from "react";
 
 export default function Container() {
-  interface ContainerData {
-    Names: string;
-    CreatedAt: string;
-    Status: string;
-    State: string;
-  }
-
-  const [data, setData] = useState<ContainerData[]>([]);
+  const [data, setData] = useState<any[]>([]);
   
   useEffect(() => {
     async function fetchData() {
@@ -61,13 +54,12 @@ export default function Container() {
       </form>
       <div className="flex flex-col gap-4 py-4">
       {data.map((item, i) => (
-        <div key={i}>
-          <h4 className="text-primary transition-colors duration-150 ease-in group-hover:text-primary/70">
-            {item.Names}
-          </h4>
-          <p className="line-clamp-2 text-sm text-muted-foreground">
-            <span><b>State:</b> {item.State}</span>・<span><b>Status:</b> {item.Status}</span>
-          </p>
+        <div key={i} className="border rounded p-2">
+          {Object.entries(item).map(([key, value]) => (
+            <p key={key} className="text-sm text-muted-foreground">
+              <b>{key}:</b> {value as string}
+            </p>
+          ))}
         </div>
       ))}
       </div>
