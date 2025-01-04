@@ -14,6 +14,8 @@ class Executor:
             if target == 'container' or target == 'containers':
                 if 'active' in token_related_target:
                     data = self.get_active()
+                elif 'inactive' in token_related_target:
+                    data = self.get_inactive()
                 else:
                     data = self.get_containers()
 
@@ -148,6 +150,40 @@ class Executor:
     # Get active containers
     def get_active(self, useKey=False):
         result = subprocess.run(["docker", "ps", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
+        if not useKey:
+            data = [
+                {
+                    "ID": container["ID"],
+                    "Names": container["Names"],
+                    "Networks": container["Networks"],
+                    "Image": container["Image"],
+                    "CreatedAt": container["CreatedAt"],
+                    "Status": container["Status"],
+                    "Ports": container["Ports"],
+                    "State": container["State"]
+                }
+                for container in (json.loads(line) for line in result.stdout.splitlines())
+            ]
+        else:
+            data = {
+                container["Names"]: {
+                    "ID": container["ID"],
+                    "Networks": container["Networks"],
+                    "Image": container["Image"],
+                    "CreatedAt": container["CreatedAt"],
+                    "Status": container["Status"],
+                    "Ports": container["Ports"],
+                    "State": container["State"]
+                }
+                for container in (json.loads(line) for line in result.stdout.splitlines())
+            }
+        return data
+    
+    def get_inactive(self, useKey=False):
+        """
+        Get the list of inactive (stopped) containers.
+        """
+        result = subprocess.run(["docker", "ps", "-a", "--filter", "status=exited", "--format", "{{json .}}"], check=True, capture_output=True, text=True)
         if not useKey:
             data = [
                 {

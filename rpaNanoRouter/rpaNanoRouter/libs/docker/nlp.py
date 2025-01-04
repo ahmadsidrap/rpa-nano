@@ -4,7 +4,7 @@ class Nlp:
 
     # Command dictionary to map the root verb to the command tokens
     command_dictionary = {
-        "show": ["show", "display"],
+        "show": ["show", "display", "list", "get", "obtain", "view", "fetch"],
         "up": ["start"],
         "down": ["shut", "stop"],
         "copy": ["copy", "transfer"],
