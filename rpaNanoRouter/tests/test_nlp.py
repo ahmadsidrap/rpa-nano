@@ -10,102 +10,102 @@ class TestNLPProcessor(unittest.TestCase):
         Test the stop command.
         """
         text = "Stop container csv"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "down")
-        self.assertEqual(b, "csv")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "down")
+        self.assertEqual(dt['target'], "csv")
 
         text = "Shut down container csv"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "down")
-        self.assertEqual(b, "csv")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "down")
+        self.assertEqual(dt['target'], "csv")
 
     def test_start(self):
         """
         Test the start command.
         """
         text = "Start container csv"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "up")
-        self.assertEqual(b, "csv")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "up")
+        self.assertEqual(dt['target'], "csv")
 
         text = "Please start container csv"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "up")
-        self.assertEqual(b, "csv")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "up")
+        self.assertEqual(dt['target'], "csv")
 
         text = "Please run container csv"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "up")
-        self.assertEqual(b, "csv")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "up")
+        self.assertEqual(dt['target'], "csv")
 
     def test_show(self):
         """
         Test the show command.
         """
         text = "Show container"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "show")
-        self.assertEqual(b, "container")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "show")
+        self.assertEqual(dt['target'], "container")
         
         text = "list me container"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "show")
-        self.assertEqual(b, "container")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "show")
+        self.assertEqual(dt['target'], "container")
         
         text = "show all running containers"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "show")
-        self.assertEqual(b, "container")
-        self.assertTrue('active' in c or 'run' in c)
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "show")
+        self.assertEqual(dt['target'], "container")
+        self.assertTrue('active' in dt['related_tokens'] or 'run' in dt['related_tokens'])
         
         text = "show exited containers"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "show")
-        self.assertEqual(b, "container")
-        self.assertTrue('inactive' in c or 'exit' in c)
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "show")
+        self.assertEqual(dt['target'], "container")
+        self.assertTrue('inactive' in dt['related_tokens'] or 'exit' in dt['related_tokens'])
         
         text = "list me volumes"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "show")
-        self.assertEqual(b, "volume")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "show")
+        self.assertEqual(dt['target'], "volume")
         
         text = "obtain all the images"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "show")
-        self.assertEqual(b, "image")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "show")
+        self.assertEqual(dt['target'], "image")
         
         text = "please fetch the images for me"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "show")
-        self.assertEqual(b, "image")
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "show")
+        self.assertEqual(dt['target'], "image")
 
     def test_copy(self):
         """
         Test the copy command.
         """
         text = "please transfer file test.txt into container git in /home"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "copy")
-        self.assertEqual(b, "git")
-        self.assertEqual(c, ['container'])
-        self.assertEqual(d['source'], 'test.txt')
-        self.assertEqual(d['path'], '/home')
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "copy")
+        self.assertEqual(dt['target'], "git")
+        self.assertEqual(dt['related_tokens'], ['container'])
+        self.assertEqual(dt['source'], 'test.txt')
+        self.assertEqual(dt['path'], '/home')
         
         text = "please transfer file test.txt into container git in /home/data/db/mysql"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "copy")
-        self.assertEqual(b, "git")
-        self.assertEqual(c, ['container', 'in'])
-        self.assertEqual(d['source'], 'test.txt')
-        self.assertEqual(d['path'], '/home/data/db/mysql')
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "copy")
+        self.assertEqual(dt['target'], "git")
+        self.assertEqual(dt['related_tokens'], ['container', 'in'])
+        self.assertEqual(dt['source'], 'test.txt')
+        self.assertEqual(dt['path'], '/home/data/db/mysql')
         
         text = "please transfer file at src/data/test.txt into container git in /home"
-        a, b, c, d = self.processor.process_command(text)
-        self.assertEqual(a, "copy")
-        self.assertEqual(b, "git")
-        self.assertEqual(c, ['container'])
-        self.assertEqual(d['source'], 'src/data/test.txt')
-        self.assertEqual(d['path'], '/home')
+        dt = self.processor.process_command(text)
+        self.assertEqual(dt['command'], "copy")
+        self.assertEqual(dt['target'], "git")
+        self.assertEqual(dt['related_tokens'], ['container'])
+        self.assertEqual(dt['source'], 'src/data/test.txt')
+        self.assertEqual(dt['path'], '/home')
 
 if __name__ == '__main__':
     unittest.main()

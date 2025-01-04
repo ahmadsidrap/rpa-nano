@@ -51,9 +51,9 @@ class Nlp:
         """
         # Parse the text using spaCy
         doc = self.nlp(text.lower())
+        data = {}
 
         # Find the root verb of the sentence
-        command = None
         original_command_word = None
         for token in doc:
             if self.debug_mode or self.debug_test:
@@ -62,40 +62,35 @@ class Nlp:
             # Check for named entities
             if token.text in self.command_map:
                 original_command_word = token.text
-                command = self.command_map[token.text]
-
-        # Find the noun chunks in the sentence
-        target = None
-        token_related_target = []
-        data = {}
+                data["command"] = self.command_map[token.text]
 
         # If the command is 'show', find the target noun and related tokens
-        if command == 'show':
+        if data["command"] == 'show':
             for token in doc:
                 # Check for nouns related to the root verb
                 if token.pos_ == 'NOUN' and token.head.text == original_command_word and token.dep_ != 'ROOT':
-                    target = token.lemma_
+                    data["target"] = token.lemma_
                     break
                 elif token.dep_ == 'ROOT' and token.head.text != token.text:
-                    target = token.lemma_
+                    data["target"] = token.lemma_
                     break
 
-        elif command == 'up' or command == 'down':
+        elif data["command"] == 'up' or data["command"] == 'down':
             has_punct = False
             for token in doc:
                 # Check for punctuation marks
                 if token.pos_ == 'PUNCT':
                     has_punct = True
-                    target = token.head.text
+                    data["target"] = token.head.text
                 # Check for nouns related to the root verb
                 # Response to command: "stop container: x"
                 if has_punct and token.head.text == original_command_word:
-                    target = token.text
+                    data["target"] = token.text
                 # Reponse to command: "stop container x"
                 elif not has_punct and token.pos_ == 'NOUN' and token.head.text == original_command_word:
-                    target = token.text
+                    data["target"] = token.text
 
-        elif command == 'copy':
+        elif data["command"] == 'copy':
             data["source"] = None
 
             for token in doc:
@@ -113,18 +108,19 @@ class Nlp:
                     break
 
                 if token.pos_ == 'NOUN' and token.head.pos_ == "ADP" and token.head.head.text == original_command_word:
-                    target = token.text
+                    data["target"] = token.text
             
-        if command is not None:
+        if data["command"] is not None:
             # Find the tokens related to the target noun
+            data["related_tokens"] = []
             for token in doc:
-                if token.head.lemma_ == target:
-                    token_related_target.append(token.lemma_)
+                if token.head.lemma_ == data["target"]:
+                    data["related_tokens"].append(token.lemma_)
 
         if self.debug_mode or self.debug_test:
-            print("Command:", command, "Target:", target, "Tokens:", token_related_target, "Data: ", data)
+            print("Data:", data)
 
-        return command, target, token_related_target, data
+        return data
     
     def get_connected_token_until_similar(self, doc, token):
         """

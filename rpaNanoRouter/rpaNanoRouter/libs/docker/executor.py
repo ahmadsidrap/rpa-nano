@@ -21,38 +21,38 @@ class Executor:
         else:
             return subprocess.run(command, check=check, capture_output=capture_output, text=text)
 
-    def execute_command(self, command, target, token_related_target, cmd_data):
+    def execute_command(self, cmd_data):
         """
         Execute the specified command on the target container.
         """
         data = []
-        if command == 'show':
-            if target == 'container':
-                if any(keyword in token_related_target for keyword in ['active', 'run']):
+        if cmd_data["command"] == 'show':
+            if cmd_data["target"] == 'container':
+                if any(keyword in cmd_data["related_tokens"] for keyword in ['active', 'run']):
                     data = self.get_active()
-                elif any(keyword in token_related_target for keyword in ['inactive', 'exit']):
+                elif any(keyword in cmd_data["related_tokens"] for keyword in ['inactive', 'exit']):
                     data = self.get_inactive()
                 else:
                     data = self.get_containers()
 
-            elif target == 'volume':
+            elif cmd_data["target"] == 'volume':
                 data = self.get_volumes()
 
-            elif target == 'image':
+            elif cmd_data["target"] == 'image':
                 data = self.get_images()
             else:
                 raise ValueError(f"Unknown target.")
 
-        elif command == 'down':
-            data = self.stop_container(target)
+        elif cmd_data["command"] == 'down':
+            data = self.stop_container(cmd_data["target"])
 
-        elif command == 'up':
-            data = self.start_container(target)
+        elif cmd_data["command"] == 'up':
+            data = self.start_container(cmd_data["target"])
 
-        elif command == 'copy':
+        elif cmd_data["command"] == 'copy':
             source = cmd_data["source"]
             path = cmd_data["path"]
-            data = self.copy_data(target, source, path)
+            data = self.copy_data(cmd_data["target"], source, path)
 
         else:
             raise ValueError(f"Unknown command.")
