@@ -90,7 +90,7 @@ class Nlp:
             data["source"] = None
             for token in doc:
                 # Source
-                if token.pos_ == 'ADJ' and token.head.text == original_command_word:
+                if token.dep_ == 'advmod' and token.head.text == original_command_word:
                     data["source"] = token.text
                 elif token.pos_ == 'PUNCT' and token.head.text == original_command_word:
                     data["path"] = token.text
