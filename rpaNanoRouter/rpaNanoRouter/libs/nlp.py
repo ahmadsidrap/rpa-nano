@@ -5,6 +5,8 @@ class Nlp:
     # Command dictionary to map the root verb to the command tokens
     command_dictionary = {
         "show": ["show", "display"],
+        "up": ["start"],
+        "down": ["shut", "stop"],
     }
 
     # Inverted dictionary to map the command tokens to the root verb
@@ -57,13 +59,31 @@ class Nlp:
         # Find the noun chunks in the sentence
         target = None
         token_related_target = []
+
+        # If the command is 'show', find the target noun and related tokens
         if command == 'show':
             for token in doc:
                 # Check for nouns related to the root verb
                 if token.pos_ == 'NOUN' and token.head.text == original_command_word:
                     target = token.text
                     break
+
+        elif command == 'up' or command == 'down':
+            has_punct = False
+            for token in doc:
+                # Check for punctuation marks
+                if token.pos_ == 'PUNCT':
+                    has_punct = True
+                    target = token.head.text
+                # Check for nouns related to the root verb
+                # Response to command: "stop container: x"
+                if has_punct and token.head.text == original_command_word:
+                    target = token.text
+                # Reponse to command: "stop container x"
+                elif not has_punct and token.pos_ == 'NOUN' and token.head.text == original_command_word:
+                    target = token.text
             
+        if command is not None:
             # Find the tokens related to the target noun
             for token in doc:
                 if token.head.text == target:

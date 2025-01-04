@@ -135,15 +135,10 @@ class RpaNlp(APIView):
         print("Command:", command, "Target:", target, "Tokens:", token_related_target)
 
         docker = Docker()
+
         data = []
         try:
-            # Execute command show container
-            if (command == 'show' and (target == 'container' or target == 'containers')):
-                if 'active' in token_related_target:
-                    data = docker.get_active()
-                else:
-                    data = docker.get_containers()
+            data = docker.execute_command(command, target, token_related_target)
         except subprocess.CalledProcessError as e:
             return Response({"message": "Error", "error": str(e.stderr)}, status=500)
-
         return Response({"message": "Success", "data": data})
