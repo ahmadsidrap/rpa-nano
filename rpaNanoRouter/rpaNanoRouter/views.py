@@ -93,7 +93,7 @@ class RpaCopy(APIView):
         return Response({"message": "Success", "data": data})
     
 class RpaNlp(APIView):
-    def get(self, request):
+    def post(self, request):
         """
         Process the input text using spaCy.
         """
@@ -101,7 +101,7 @@ class RpaNlp(APIView):
         nlp = Nlp()
         
         # Get the text from the request
-        message = request.query_params.get("msg", None)
+        message = request.data.get("message", None)
         # Process the text
         command, target, token_related_target, cmd_data = nlp.process_command(message)
         print("Command:", command, "Target:", target, "Tokens:", token_related_target, "Data: ", cmd_data)
