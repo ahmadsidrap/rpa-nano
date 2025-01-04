@@ -90,11 +90,11 @@ class Nlp:
             data["source"] = None
             for token in doc:
                 # Source
-                if token.dep_ == 'advmod' and token.head.text == original_command_word:
+                if (token.dep_ == 'advmod' or token.dep_ == 'oprd' or token.dep_ == 'appos') and token.head.text == original_command_word:
                     data["source"] = token.text
                 elif token.pos_ == 'PUNCT' and token.head.text == original_command_word:
                     data["path"] = token.text
-                if token.pos_ == 'NOUN' and token.head.text == "into":
+                if token.pos_ == 'NOUN' and token.head.pos_ == "ADP" and token.head.head.text == original_command_word:
                     target = token.text
             
         if command is not None:

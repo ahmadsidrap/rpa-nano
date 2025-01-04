@@ -70,10 +70,10 @@ class Executor:
             containerDst = images[f"rpa-{target}"]
             idDst = containerDst["ID"]
             pathSrc = f"./shared/{source}"
-            pathDst = f"{idDst}:/{path}"
+            pathDst = f"{idDst}:{path}"
         else:
             pathSrc = f"./shared/{source}"
-            pathDst = f"{target}:/{path}"
+            pathDst = f"{target}:{path}"
 
         result = self.subprocess_run(["docker", "cp", pathSrc, pathDst], check=True, capture_output=True, text=True)
         if self.debug_mode:
