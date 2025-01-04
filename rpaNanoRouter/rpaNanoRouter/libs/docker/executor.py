@@ -27,7 +27,7 @@ class Executor:
         """
         data = []
         if command == 'show':
-            if target == 'container' or target == 'containers':
+            if target == 'container':
                 if 'active' in token_related_target:
                     data = self.get_active()
                 elif 'inactive' in token_related_target:
@@ -35,10 +35,10 @@ class Executor:
                 else:
                     data = self.get_containers()
 
-            elif target == 'volume' or target == 'volumes':
+            elif target == 'volume':
                 data = self.get_volumes()
 
-            elif target == 'image' or target == 'images':
+            elif target == 'image':
                 data = self.get_images()
             else:
                 raise ValueError(f"Unknown target.")
