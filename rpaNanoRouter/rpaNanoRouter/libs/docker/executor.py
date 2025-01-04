@@ -2,8 +2,8 @@ import json
 import subprocess
 import os
 
-# Define the Docker class
-class Docker:
+# Define the Executor class
+class Executor:
 
     def execute_command(self, command, target, token_related_target, cmd_data):
         """

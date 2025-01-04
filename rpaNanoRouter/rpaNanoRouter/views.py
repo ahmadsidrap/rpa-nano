@@ -1,8 +1,8 @@
 import subprocess
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .libs.docker import Docker
-from .libs.nlp import Nlp
+from .libs.docker.executor import Executor as Docker
+from .libs.docker.nlp import Nlp
     
 class RpaNlp(APIView):
     def post(self, request):
