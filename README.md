@@ -1,9 +1,12 @@
 # rpa-nano
 RPA for nano services
 
+![image](https://github.com/user-attachments/assets/6e7d3c6e-662e-402d-b173-a04b6a005f4f)
+
+
 ### Official homepage
 
-[https://introvesia.com](https://introvesia.com)
+[https://lib.introvesia.com/books/rpa-nano](https://lib.introvesia.com/books/rpa-nano)
 
 ## RPA Router
 
@@ -29,7 +32,3 @@ python manage.py createsuperuser
 cd rpaNanoRouter
 python manage.py runserver
 ```
-
-## APIs
-
-Read the full documentation [here](https://lib.introvesia.com/books/rpa-nano/page/api-list)
