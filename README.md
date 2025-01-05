@@ -8,6 +8,11 @@ RPA for nano services
 
 [https://lib.introvesia.com/books/rpa-nano](https://lib.introvesia.com/books/rpa-nano)
 
+### Workflow
+
+![rpa](https://github.com/user-attachments/assets/5aef3536-04c0-4fff-a5b5-28d61d18cd4a)
+
+
 ## RPA Router
 
 RPA Router is an API to handle request.
