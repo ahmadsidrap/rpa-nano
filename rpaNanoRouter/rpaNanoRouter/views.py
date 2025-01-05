@@ -17,6 +17,7 @@ class RpaNlp(APIView):
         message = request.data.get("message", None)
         # Process the text
         cmd_data = nlp.process_command(message)
+        print("cmd_data:", cmd_data)
 
         docker = CliExecutor()
         status = 200

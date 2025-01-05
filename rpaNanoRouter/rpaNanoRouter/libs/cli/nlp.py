@@ -3,14 +3,6 @@ import os
 
 class Nlp:
 
-    # Command dictionary to map the root verb to the command tokens
-    command_dictionary = {
-        "show": ["show", "display", "list", "get", "obtain", "view", "fetch"],
-        "up": ["start", "run", "begin", "launch"],
-        "down": ["shut", "stop"],
-        "copy": ["copy", "transfer"],
-    }
-
     # Inverted dictionary to map the command tokens to the root verb
     command_map = {}
 
@@ -21,19 +13,6 @@ class Nlp:
 
         # Load the spaCy English language model
         self.nlp = spacy.load("en_core_web_sm")
-
-        # Indexing command dictionary
-        self.command_map = self.command_dictionary_index()
-    
-    def command_dictionary_index(self):
-        """
-        Create an inverted dictionary to map the command tokens to the root verb
-        """
-        inverted_dict = {}
-        for key, values in self.command_dictionary.items():
-            for value in values:
-                inverted_dict[value] = key
-        return inverted_dict
 
     def process_command(self, text):
         """
@@ -55,18 +34,88 @@ class Nlp:
         # Check for what type of question
         command = self.parse_what(doc)
         if command:
+            data["type"] = "what"
             data["command"] = command
+            return data
+        
+        # Check for auxiliary verbs
+        command = self.parse_auxiliary(doc)
+        if command:
+            data["type"] = "auxiliary"
+            data["command"] = command
+            return data
+        
+        # Check for command type
+        verb, noun, target, related_tokens = self.parse_command(doc)
+        if verb is not None:
+            data["type"] = "command"
+            data["command"] = verb
+            data["object"] = noun
+            data["target"] = target
+            data["related_tokens"] = related_tokens
             return data
         
         # Check for who type of question
         command = self.parse_who(doc)
         if command:
+            data["type"] = "who"
             data['command'] = 'show'
             data['target'] = 'container'
             data['related_tokens'] = ['active']
             return data
         
         return data
+    
+    def parse_command(self, doc):
+        """
+        Parse the command tokens
+        """
+        # Define the pattern for matching questions
+        pattern1 = [{"POS": "VERB"}, {"POS": "PRON", "OP": "?"}, {"POS": "DET", "OP": "?"}, {"POS": "ADJ", "OP": "?"}, {"POS": "NOUN"}]
+        pattern2 = [{"POS": "VERB"}, {"POS": "PRON", "OP": "?"}, {"POS": "DET", "OP": "?"}, {"POS": "ADJ", "OP": "?"}, {"POS": "PROPN"}]
+        matcher = spacy.matcher.Matcher(self.nlp.vocab)
+        matcher.add("CommandQuery", [pattern1, pattern2])
+
+        # Apply the matcher to the doc
+        verb = None
+        adjectives = []
+        matches = matcher(doc)
+        for match_id, start, end in matches:
+            span = doc[start:end]
+            print("Matched span:", span.text)
+            for token in span:
+                if token.pos_ == "VERB":
+                    print("Verb found:", token.text)
+                    verb = token.lemma_
+                if token.pos_ == "ADJ":
+                    print("Adjective found:", token.text)
+                    adjectives.append(token.lemma_)
+                if token.pos_ == "NOUN" or token.pos_ == "PROPN":
+                    print("Noun found:", token.text)
+                    target = ''.join([t.text for t in doc[token.i+1:]])
+                    return verb, token.lemma_, target, adjectives
+
+        return None, None, None, None
+    
+    def parse_auxiliary(self, doc):
+        """
+        Parse the auxiliary verbs
+        """
+        # Define the pattern for matching questions
+        pattern = [{"POS": "NOUN"}, {"POS": "ADV", "OP": "?"}, {"POS": "AUX"}, {"POS": "PUNCT", "OP": "?"}]
+        matcher = spacy.matcher.Matcher(self.nlp.vocab)
+        matcher.add("AuxQuery", [pattern])
+
+        # Apply the matcher to the doc
+        matches = matcher(doc)
+        for match_id, start, end in matches:
+            span = doc[start:end]
+            print("Matched span:", span.text)
+            for token in span:
+                if token.pos_ == "NOUN":
+                    print("Noun found:", token.text)
+                    return token.text
+        return False
     
     def parse_who(self, doc):
         """

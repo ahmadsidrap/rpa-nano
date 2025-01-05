@@ -24,11 +24,16 @@ class Executor:
             print(f"Execute command: {command_str}")
             return f"Execute command: {command_str}"
         else:
+            if isinstance(command, str):
+                command = command.split()
             commands = ['docker', 'exec', '-ti', self.container_id]
             commands.extend(command)
             result = subprocess.run(commands, check=check, capture_output=capture_output, text=text)
             # result = subprocess.run(command, check=check, capture_output=capture_output, text=text)
-            return result.stdout
+            if result.returncode == 0:
+                return result.stdout
+            else:
+                raise ValueError(result.stderr)
 
     def execute_command(self, cmd_data):
         """
@@ -37,8 +42,17 @@ class Executor:
         data = []
         if cmd_data["command"] == 'time':
             data = self.command_date()
+        elif cmd_data["command"] == 'enter':
+            data = self.command_enter_container(cmd_data["target"])
+        elif cmd_data["command"] == 'user':
+            data = self.command_user()
+        elif cmd_data["command"] == 'show':
+            if 'current' in cmd_data["related_tokens"]:
+                data = self.command_current_directory()
+            else:
+                data = self.command_current_dirs(cmd_data["target"])
         else:
-            raise ValueError(f"Unknown command.")
+            raise ValueError(f"Unknown command: {cmd_data['command']}")
         return data
         
     def command_date(self):
@@ -51,5 +65,32 @@ class Executor:
         # Format as desired
         formatted_date = dt_object.strftime(f"%Y-%m-%d %H:%M:%S {timezone_string}")
         return formatted_date
+    
+    def command_current_directory(self):
+        # Get the current directory
+        directory = self.subprocess_run(['pwd']).strip()
+        return directory
+    
+    def command_current_dirs(self, path = None):
+        # Get the current directory
+        if path is None:
+            path = "."
+        else:
+            path = f"./{path}"
+        output = self.subprocess_run(["find", path, "-mindepth", "1", "-maxdepth", "1", "-type", "d", "-print0"]).strip()
+
+        # Process the output into JSON array
+        directories = output.strip('\0').split('\0')[:-1]  # Remove trailing empty element
+        return directories
+    
+    def command_enter_container(self, path):
+        # Enter the specified container
+        output = self.subprocess_run(['/bin/sh', '-c', 'cd', path, '&&', "find", ".", "-mindepth", "1", "-maxdepth", "1", "-type", "d", "-print0"])
+        return output
+    
+    def command_user(self):
+        # Get the current user
+        user = self.subprocess_run(['whoami']).strip()
+        return user
     
     
